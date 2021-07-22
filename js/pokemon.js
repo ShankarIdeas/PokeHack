@@ -15,28 +15,34 @@ function toTitleCase(str) {
   return str.join(" ");
 }
 
-function acquireAbilities(chosen, abilityUl){
-    var abilities = [];
-    abilities = chosen.abilities;
-    for (let index = 0; index < abilities.length; index++) {
-        const element = abilities[index];
-            for (const key in element) {
-                if (Object.hasOwnProperty.call(element, key)) {
-                    const item = element[key];
-                    if(key == "ability"){
-                        let abilityLi = document.createElement('li');
-                        abilityLi.innerText = item.name;
-                        abilityUl.append(abilityLi)
-                    }
-                    
-
-                }
-            }
-        
+function acquireAbilities(chosen) {
+  let pokenAbleTd = document.createElement("td");
+ 
+    let abilityUl = document.createElement("ul");
+    pokenAbleTd.innerHTML = "<strong>&nbsp;Abilities</strong>";
+    pokenAbleTd.className = "abilityFacts"
+    abilityUl.classList.add("small");
+  
+  var abilities = [];
+  abilities = chosen.abilities;
+  for (let index = 0; index < abilities.length; index++) {
+    const element = abilities[index];
+    for (const key in element) {
+      if (Object.hasOwnProperty.call(element, key)) {
+        const item = element[key];
+        if (key == "ability") {
+          let abilityLi = document.createElement("li");
+          abilityLi.innerText = item.name;
+          abilityUl.append(abilityLi);
+        }
+      }
     }
+  }
+  pokenAbleTd.append(abilityUl);
+  return pokenAbleTd;
 }
 // To create the card with pokemon image with the name
-function createImage(ID, pokeBallDiv, name) {
+async function createImage(ID, pokeBallDiv, name) {
   let pokeBall = document.createElement("tr");
   pokeBall.classList.add("image");
   let pokenPhoto = document.createElement("img");
@@ -49,87 +55,89 @@ function createImage(ID, pokeBallDiv, name) {
   pokeBallDiv.append(pokeBall);
 }
 
-
-function renderMonster(chosen) {
-  let basket = document.getElementById("features");
-  let pokeBall = document.createElement("div");
+//To tag weights
+let badgeWeights = function(weights){
   let weightRow = document.createElement("tr");
   weightRow.classList.add("weights");
   let weightBadge = document.createElement("span");
-  //create the cards
-  pokeBall.classList.add("cards");
   //add the weights using W3C Badges
   weightBadge.classList.add("w3-badge");
-  weightBadge.classList.add("w3-tiny")
+  weightBadge.classList.add("w3-tiny");
   weightBadge.classList.add("w3-right");
   weightBadge.classList.add("w3-margin-right");
   //weightBadge.classList.add("w3-padding");
-  let weight = chosen.weight; 
-  if(weight < 50 ){
+  if (weights < 50) {
     weightBadge.classList.add("w3-yellow");
-  }else if(weight < 75 && weight >= 50 ){
+  } else if (weights < 75 && weights >= 50) {
     weightBadge.classList.add("w3-green");
-  }else if(weight < 100 && weight >= 75){
+  } else if (weights < 100 && weights >= 75) {
     weightBadge.classList.add("w3-red");
-  }else if(weight < 200 && weight >= 100){
+  } else if (weights < 200 && weights >= 100) {
     weightBadge.classList.add("w3-dark-grey");
-  }else if(weight < 300 && weight >= 200){
+  } else if (weights < 300 && weights >= 200) {
     weightBadge.classList.add("w3-brown");
-  }else if(weight < 400 && weight >= 300){
+  } else if (weights < 400 && weights >= 300) {
     weightBadge.classList.add("w3-light-grey");
-  }else if (weight >=400){
+  } else if (weights >= 400) {
     weightBadge.classList.add("w3-amber");
-  }else{
+  } else {
     weightBadge.classList.add("w3-pale-green");
   }
-  weightBadge.innerHTML=weight;
+  weightBadge.innerHTML = weights;
   weightRow.appendChild(weightBadge);
-
-  pokeBall.appendChild(weightRow); 
-  //add the abilities
-    let abilityUl = document.createElement('ul');
-    abilityUl.innerHTML = "<strong>Abilities</strong>";
-    abilityUl.classList.add("small");
-  acquireAbilities(chosen, abilityUl);
+  return weightRow;
+}
+async function renderMonster(chosen) {
+  let basket = document.getElementById("features");
+  let pokeBall = document.createElement("div");
+  //create the cards
+  pokeBall.classList.add("cards");
+   //add weights
+  let weights = chosen.weight;
+  pokeBall.appendChild(badgeWeights(weights));
   let pokenCharsRow = document.createElement("tr");
   pokenCharsRow.classList.add("spreadOut");
-  let pokenAbleTd = document.createElement('td');
-  pokenAbleTd.append(abilityUl);
-  //capture the moves
-  let movesUl = document.createElement('ul');
-  movesUl.innerHTML = "<strong>Moves</strong>";
-  movesUl.classList.add("movesLi");
-  captureTop5Moves(chosen, movesUl);
-  let pokenMovesTd = document.createElement('td');
-  pokenMovesTd.append(movesUl);
-  pokenCharsRow.append(pokenAbleTd,pokenMovesTd);
-  createImage(chosen.id, pokeBall, chosen.name);
+  //add the abilities & capture the moves as TDs!
+  pokenCharsRow.append(acquireAbilities(chosen), captureTop5Moves(chosen));
+  //Try Capturing the images for all the 50 pokemon
+  try{
+  let imagesAcquired = createImage(chosen.id, pokeBall, chosen.name);
+  imagesAcquired
+    .then(console.log("cards images acquired"));
+  } catch (error){
+    console.log(error);
+  }
   pokeBall.append(pokenCharsRow);
   basket.appendChild(pokeBall);
 }
 //Restrict move capturing to 5 as some have extensive moves learnt
-function captureTop5Moves(chosen, movesUl){
+function captureTop5Moves(chosen) {
+  let pokenMovesTd = document.createElement("td");
+  let movesUl = document.createElement("ul");
+  pokenMovesTd.innerHTML = "<strong>Moves&nbsp;</strong>";
+  pokenMovesTd.className = "moveFacts"
+  movesUl.classList.add("movesLi");
   var moves = [];
-  moves = chosen.moves
+  moves = chosen.moves;
   for (let index = 0; index < moves.length; index++) {
-      const element = moves[index];
-          for (const key in element) {
-              if (Object.hasOwnProperty.call(element, key)) {
-                  const item = element[key];
-                  if(key == "move" && index < 5){// restricting to just 5 first of the list moves
-                      let moveLi = document.createElement('li');
-                      moveLi.innerText = item.name;
-                      movesUl.append(moveLi)
-                  }
-                  
-
-              }
-          }
-      
+    const element = moves[index];
+    for (const key in element) {
+      if (Object.hasOwnProperty.call(element, key)) {
+        const item = element[key];
+        if (key == "move" && index < 5) {
+          // restricting to just 5 first of the list moves
+          let moveLi = document.createElement("li");
+          moveLi.innerText = item.name;
+          movesUl.append(moveLi);
+        }
+      }
+    }
   }
+  pokenMovesTd.append(movesUl);
+  return(pokenMovesTd);
 }
 
-catchAllPokemon = function () {
+let catchAllPokemon = function () {
   let pokeBalls = document.querySelector("#features");
   fetch("https://pokeapi.co/api/v2/pokemon?limit=50")
     .then((response) => response.json())

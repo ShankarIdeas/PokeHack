@@ -261,14 +261,23 @@ display: flex;
 .movesLi {
   font-size: small;
   text-align: right;
-  flex-basis: content;
   list-style: inside none;
   line-height: 1.2em;
   flex-wrap: wrap;
   margin: 0.875em 0.5em;
 }
-
-
+.abilityFacts{
+  margin-top: 5px;
+  padding-left: 10px;
+  text-align: start;
+  line-height: 0%;
+}
+.moveFacts{
+  margin-top: 5px;
+  padding-right:10px;
+  text-align: end;
+  line-height: 0%;
+}
 #features {
   margin: auto;
   flex-basis: auto;
